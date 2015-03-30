@@ -15,19 +15,9 @@ and here's an example:
 
 var query = qodata.query('https://my.api.domain');
 
-query
-	.from('Employees')
-	.select(['FirstName','LastName','Hired','Job'])
-	.where(
-		qodata.filter('LastName')
-			.contains('doe')
-		.and('Job')
-			.equals('Manager')
-		.and('Hired')
-			.lessThan(5)
-	)
-	.orderby('LastName')
-		.desc()
+query.from('Employees')
+
+query.from('Employees').select(['FirstName','LastName','Hired','Job']).where(qodata.filter('LastName').contains('doe').and('Job').equals('Manager').and('Hired').lessThan(5)).orderby('LastName').desc();
 		
 query.toString();
 
