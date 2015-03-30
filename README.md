@@ -11,16 +11,3 @@ Despite a lots of bugs might be present, this version is still usable.
 
 Documentation in progress...
 
-and here's an example:
-
-var query = qodata.query('https://my.api.domain');
-
-query.from('Employees')
-
-query.from('Employees').select(['FirstName','LastName','Hired','Job']).where(qodata.filter('LastName').contains('doe').and('Job').equals('Manager').and('Hired').lessThan(5)).orderby('LastName').desc();
-		
-query.toString();
-
-and the result:
-
-https://my.api.domain/Employees?$select=FirstName,LastName,Hired,Job&$orderby=LastName desc&$filter=contains(LastName,'doe') and Job eq 'Manager' and Hired lt 5
