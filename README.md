@@ -17,7 +17,7 @@ var query = qodata.query('https://my.api.domain');
 
 query
 	.from('Employees')
-	.select('FirstName,LastName,Hired,Job') // alt. syntax -> .select(['FirstName','LastName','Hired','Job'])
+	.select(['FirstName','LastName','Hired','Job'])
 	.where(
 		qodata.filter('LastName')
 			.contains('doe')
