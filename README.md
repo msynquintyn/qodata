@@ -19,7 +19,7 @@ Create a new qodata query by passing the service root uri
     var myQuery = qodata.query('https://my.com/api');
         
 ## toString
-Get the query in OData format by calling the toString() method
+Get the query in OData format by calling the toString method
 
     myQuery.toString();
         
@@ -65,7 +65,7 @@ Call this method to instanciate a new filter
     var filter = qodata.filter('FirstName').equals('John');
         
 ### FUNCTION entity
-Call this method to instanciate a new filter
+Call this method to instanciate a new entity
 
 Entities CAN be used as parameter of the 'from' method.
 
