@@ -518,7 +518,7 @@ var entity = function(e){
 	};
 	
 	var topSettings = {
-		top: qodata.defaults.top !== undefined ? qodata.defaults.top : undefined,
+		top: qodata.defaults.top,
 		toString: function(){
 			if(this.isset())
 				return '$top={0}'.format(this.top);
@@ -538,7 +538,7 @@ var entity = function(e){
 	};
 	
 	var skipSettings = {
-		skip: qodata.defaults.skip !== undefined ? qodata.defaults.skip : undefined,
+		skip: qodata.defaults.skip,
 		toString: function(){
 			if(this.isset())
 				return '$skip={0}'.format(this.skip);
