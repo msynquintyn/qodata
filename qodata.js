@@ -32,7 +32,7 @@ if (!String.prototype.trim) {
 
 (function (window) {
 
-// "use strict";
+"use strict";
 
 function _funcFormat(operator, property, value){
 	return '{0}({1}{2}{3})'
@@ -363,7 +363,7 @@ function filter(property){
 }
 
 var entity = function(e){
-	var name = e;
+	this.name = e;
 	
 	var that = this;
 	
@@ -378,6 +378,10 @@ var entity = function(e){
 	};
 	this.single = function(id){
 		idSettings.id = typeof id == 'string' ? qodata.literal(id) : id;
+		return this;
+	};
+	this.single.reset = function(){
+		idSettings.id = null;
 		return this;
 	};
 	
@@ -396,12 +400,23 @@ var entity = function(e){
 		selectSettings.properties = Array.isArray(properties) ? properties : properties.split(',');
 		return this;
 	};
+	this.select.reset = function(){
+		selectSettings.properties.length = 0;
+		return this;
+	};
+	this.select.remove = function(property){
+		if(selectSettings.properties.indexOf(property) > -1)
+			selectSettings.properties.splice(selectSettings.properties.indexOf(property), 1);
+		return this;
+	};
 	
 	var expandSettings = {
 		expands: {},
 		set: function(ex){
-			if(!this.expands[ex])
-				this.expands[ex] = new entity(ex);
+			var name = ex instanceof entity ? ex.name : ex;
+			
+			if(!this.expands[name])
+				this.expands[name] = ex instanceof entity ? ex : new entity(ex);
 			return this.expands[ex];
 		},
 		toString: function(){
@@ -417,6 +432,17 @@ var entity = function(e){
 	};
 	this.expand = function(ex){
 		return expandSettings.set(ex);
+	};
+	this.expand.reset = function(){
+		expandSettings = {};
+		return this;
+	};
+	this.expand.remove = function(ex){
+		var name = ex instanceof entity ? ex.name : ex;
+		
+		if(expandSettings.expands[name])
+			delete expandSettings.expands[name];
+		return this;
 	};
 
 	var orderbySettings = {
@@ -440,6 +466,15 @@ var entity = function(e){
 			orderbySettings.properties[properties] = new _order(that, properties);
 		return orderbySettings.properties[properties];
 	};
+	this.orderby.reset = function(){
+		orderbySettings.properties = {};
+		return this;
+	};
+	this.orderby.remove = function(properties){
+		if(orderbySettings.properties[properties])
+			delete orderbySettings.properties[properties];
+		return this;
+	};
 	
 	var filterSettings = {
 		filter: null,
@@ -452,6 +487,10 @@ var entity = function(e){
 	};
 	this.where = function(filter){
 		filterSettings.filter = filter;
+		return this;
+	};
+	this.where.reset = function(){
+		filterSettings.filter = null;
 		return this;
 	};
 	
@@ -473,9 +512,13 @@ var entity = function(e){
 		//valueSettings.property = property;
 		return this;
 	}
+	this.asValue.reset = function(){
+		valueSettings.value = false;
+		return this;
+	};
 	
 	var topSettings = {
-		top: undefined,
+		top: qodata.defaults.top !== undefined ? qodata.defaults.top : undefined,
 		toString: function(){
 			if(this.isset())
 				return '$top={0}'.format(this.top);
@@ -489,9 +532,13 @@ var entity = function(e){
 		topSettings.top = n;
 		return this;
 	};
+	this.top.reset = function(){
+		topSettings.top = qodata.defaults.top;
+		return this;
+	};
 	
 	var skipSettings = {
-		skip: undefined,
+		skip: qodata.defaults.skip !== undefined ? qodata.defaults.skip : undefined,
 		toString: function(){
 			if(this.isset())
 				return '$skip={0}'.format(this.skip);
@@ -505,14 +552,17 @@ var entity = function(e){
 		skipSettings.skip = n;
 		return this;
 	};
+	this.skip.reset = function(){
+		skipSettings.skip = qodata.defaults.skip;
+		return this;
+	};
 	
 	var navSettings = {
 		properties: [],
-		push: function(prop){
-			if(Array.isArray(prop))
-				this.properties = this.properties.concat(prop);
-			else
-				this.properties.push(prop);
+		push: function(propArray){
+			// check for same entries
+			if(this.properties.join('/') != propArray.join('/'))
+				this.properties = this.properties.concat(propArray);
 			return that;
 		},
 		isset: function(){
@@ -525,7 +575,10 @@ var entity = function(e){
 		}
 	};
 	this.navigate = function(p){
-		return navSettings.push(p.split('/'));
+		return navSettings.push(Array.isArray(p) ? p : p.split('/'));
+	};
+	this.navigate.reset = function(){
+		navSettings.properties.length = 0;
 	};
 	
 	this.toString = function(expandString = false, asInnerString = false){
@@ -550,15 +603,15 @@ var entity = function(e){
 			// parts.push(formatSettings.toString());
 		
 		if(!parts.length)
-			qs = '{0}{1}{2}{3}'.format(name, idSettings.toString(), navSettings.toString(), valueSettings.toString());
+			qs = '{0}{1}{2}{3}'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString());
 		else
 		{
 			if(expandString)
-				qs = '{0}{1}{2}{3}({4})'.format(name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join(';'));
+				qs = '{0}{1}{2}{3}({4})'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join(';'));
 			else
 			{
 				if(!asInnerString)
-					qs = '{0}{1}{2}{3}?{4}'.format(name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join('&'));
+					qs = '{0}{1}{2}{3}?{4}'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join('&'));
 				else
 					qs = parts.join('&');
 			}
@@ -569,11 +622,12 @@ var entity = function(e){
 };
 
 var q = function(serviceUri){
+	var that = this;
+	
 	this.service = serviceUri;
 	
-	
 	var countSettings = {
-		count: false,
+		count: qodata.defaults.count,
 		toString: function(){
 			if(this.isset())
 				return '$count=true';
@@ -585,11 +639,15 @@ var q = function(serviceUri){
 	};
 	this.count = function(doCount){
 		countSettings.count = doCount == undefined ? true : doCount;
-		return this;
+		return that;
+	};
+	this.count.reset = function(){
+		countSettings.count = qodata.defaults.count;
+		return that;
 	};
 	
 	var metaSettings = {
-		meta: false,
+		meta: qodata.defaults.metadata,
 		toString: function(){
 			if(this.isset())
 				return '$metadata';
@@ -601,11 +659,15 @@ var q = function(serviceUri){
 	};
 	this.metadata = function(meta){
 		metaSettings.meta = meta != undefined ? meta : true;
-		return this;
+		return that;
+	};
+	this.metadata.reset = function(){
+		metaSettings.meta = qodata.defaults.metadata;
+		return that;
 	};
 	
 	var formatSettings = {
-		formatter: null,
+		formatter: qodata.defaults.format,
 		toString: function(){
 			if(this.isset())
 				return '$format={0}'.format(this.formatter);
@@ -617,7 +679,11 @@ var q = function(serviceUri){
 	};
 	this.format = function(value){
 		formatSettings.formatter = value;
-		return this;
+		return that;
+	};
+	this.format.reset = function(){
+		formatSettings.formatter = qodata.defaults.format;
+		return that;
 	};
 	
 	var entitySettings = {
@@ -637,6 +703,158 @@ var q = function(serviceUri){
 	};
 	this.from = function(entity, id){
 		return entitySettings.set(entity, id);
+	};
+	
+	function checkEntity(){
+		if(!entitySettings.isset())
+			throw 'an entity (from) must be set before calling me...';
+	}
+	
+	this.single = function(id){
+		checkEntity();
+		entitySettings.entity.single(id);
+		
+		return that;
+	};
+	
+	this.select = function(properties){
+		checkEntity();
+		entitySettings.entity.select(properties);
+		
+		return that;
+	};
+	this.select.remove = function(property){
+		checkEntity();
+		entitySettings.entity.select.remove(property);
+		
+		return that;
+	};
+	this.select.reset = function(){
+		checkEntity();
+		entitySettings.entity.select.reset();
+		
+		return that;
+	};
+	
+	this.expand = function(entity){
+		checkEntity();
+		return entitySettings.entity.expand(entity);
+		
+		return that;
+	};
+	this.expand.remove = function(entity){
+		checkEntity();
+		return entitySettings.entity.expand.remove(entity);
+		
+		return that;
+	};
+	this.expand.reset = function(){
+		checkEntity();
+		return entitySettings.entity.expand.reset();
+		
+		return that;
+	};
+	
+	this.orderby = function(properties){
+		checkEntity();
+		entitySettings.entity.orderby(properties);
+		
+		return that;
+	};
+	this.orderby.reset = function(){
+		checkEntity();
+		entitySettings.entity.orderby.reset();
+		
+		return that;
+	};
+	this.orderby.remove = function(properties){
+		checkEntity();
+		entitySettings.entity.orderby.remove(properties);
+		
+		return that;
+	};
+	this.orderby.toggle = function(properties){
+		checkEntity();
+		entitySettings.entity.orderby(properties).toggle();
+		
+		return that;
+	};
+	this.orderby.asc = function(properties){
+		checkEntity();
+		entitySettings.entity.orderby(properties).asc();
+		
+		return that;
+	};
+	this.orderby.desc = function(properties){
+		checkEntity();
+		entitySettings.entity.orderby(properties).desc();
+		
+		return that;
+	};
+	
+	this.where = function(filter){
+		checkEntity();
+		entitySettings.entity.where(filter);
+		
+		return that;
+	};
+	this.where.reset = function(){
+		checkEntity();
+		entitySettings.entity.where.reset();
+		
+		return that;
+	};
+	
+	this.asValue = function(value){
+		checkEntity();
+		entitySettings.entity.asValue(value);
+		
+		return that;
+	};
+	this.asValue.reset = function(){
+		checkEntity();
+		entitySettings.entity.asValue.reset();
+		
+		return that;
+	};
+	
+	this.top = function(n){
+		checkEntity();
+		entitySettings.entity.top(n);
+		
+		return that;
+	};
+	this.top.reset = function(n){
+		checkEntity();
+		entitySettings.entity.top.reset();
+		
+		return that;
+	};
+	
+	this.skip = function(n){
+		checkEntity();
+		entitySettings.entity.skip(n);
+		
+		return that;
+	};
+	this.skip.reset = function(){
+		checkEntity();
+		entitySettings.entity.skip.reset();
+		
+		return that;
+	};
+	
+	this.navigate = function(properties){
+		checkEntity();
+		entitySettings.entity.navigate(properties);
+		
+		return that;
+	};
+	this.navigate.reset = function(){
+		checkEntity();
+		entitySettings.entity.navigate.reset();
+		
+		return that;
 	};
 	
 	function asInnerString(includeEntityName = true){
@@ -672,6 +890,9 @@ window.qodata = {
 	filter : function(property){
 		return new filter(property);
 	},
+	entity : function(name){
+		return new entity(name);
+	},
 	literal: function(s){
 		return "'{0}'".format(s);
 	},
@@ -680,6 +901,13 @@ window.qodata = {
 	},
 	root: function(entity){
 		return '$root/{0}'.format(entity);
+	},
+	defaults: {
+		top: undefined,
+		skip: undefined,
+		count: false,
+		metadata: false,
+		format: null
 	}
 };
 
