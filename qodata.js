@@ -1,8 +1,8 @@
  /*
 	http://host:port/path/SampleService.svc/
-		-> service root url
+		-> service root URL
 	Categories(1)/Products
-		-> ressource path
+		-> resource path
 	?$top=2&$orderby=Name
 	 -> query options
  */
@@ -90,9 +90,9 @@ function _lambdaFuncFormat(operator, property, f){
 		).trim();
 }
 
-function _link(operator, sep = ' '){
+function _link(operator, sep){
 	this.toString = function(){
-		return '{0}{1}{0}'.format(sep, operator);
+		return '{0}{1}{0}'.format(sep === undefined ? ' ' : sep, operator);
 	};
 }
 
@@ -581,8 +581,11 @@ var entity = function(e){
 		navSettings.properties.length = 0;
 	};
 	
-	this.toString = function(expandString = false, asInnerString = false){
+	this.toString = function(expandString, asInnerString){
 		var parts = [], qs = '';
+		
+		var expand = expandString === undefined ? false : expandString;
+		var inner = asInnerString === undefined ? false : asInnerString;
 		
 		if(selectSettings.isset())
 			parts.push(selectSettings.toString());
@@ -606,11 +609,11 @@ var entity = function(e){
 			qs = '{0}{1}{2}{3}'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString());
 		else
 		{
-			if(expandString)
+			if(expand)
 				qs = '{0}{1}{2}{3}({4})'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join(';'));
 			else
 			{
-				if(!asInnerString)
+				if(!inner)
 					qs = '{0}{1}{2}{3}?{4}'.format(this.name, idSettings.toString(), navSettings.toString(), valueSettings.toString(), parts.join('&'));
 				else
 					qs = parts.join('&');
@@ -690,9 +693,11 @@ var q = function(serviceUri){
 		entity: null,
 		current: null,
 		set: function(e, id){
-			if(this.current != e)
-				this.entity = new entity(e);
-			this.current = e;
+			var name = e instanceof entity ? e.name : e;
+			
+			if(this.current != name)
+				this.entity = e instanceof entity ? e : new entity(name);
+			this.current = name;
 			if(id !== undefined)
 				this.entity.single(id);
 			return this.entity;
@@ -713,6 +718,12 @@ var q = function(serviceUri){
 	this.single = function(id){
 		checkEntity();
 		entitySettings.entity.single(id);
+		
+		return that;
+	};
+	this.single.reset = function(){
+		checkEntity();
+		entitySettings.entity.single.reset();
 		
 		return that;
 	};
@@ -738,7 +749,7 @@ var q = function(serviceUri){
 	
 	this.expand = function(entity){
 		checkEntity();
-		return entitySettings.entity.expand(entity);
+		entitySettings.entity.expand(entity);
 		
 		return that;
 	};
@@ -857,11 +868,13 @@ var q = function(serviceUri){
 		return that;
 	};
 	
-	function asInnerString(includeEntityName = true){
+	function asInnerString(includeEntityName){
 		var parts = [];
 		
+		var inc = includeEntityName === undefined ? true : includeEntityName;
+		
 		if(entitySettings.isset())
-			parts.push(entitySettings.entity.toString(false, includeEntityName));
+			parts.push(entitySettings.entity.toString(false, inc));
 		if(countSettings.isset())
 			parts.push(countSettings.toString());
 		if(formatSettings.isset())
