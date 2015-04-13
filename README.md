@@ -399,7 +399,7 @@ See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-c
 
 This method is a singleton, that is eveytime you call this method, the previous filter is replaced
 
-##### creating a filter
+##### creating a filter for the where function
 
         var filter = qodata.filter('FirstName').equals('John');
         
@@ -463,3 +463,197 @@ param1 : mandatory, can be a '/' separated string or an array
 
     customers.navigate.reset();
     
+### The filter namespace
+qodata filters are used in the qodata.query.where and qodata.entity.where functions
+
+Args passed to the filter operators / functions can be simple objects or an instance of a filter
+
+#### creating a filter
+
+        var filter = qodata.filter('FirstName');
+        
+#### comparison operators
+
+##### equals
+
+        filter.equals('John');
+        
+##### notEquals
+
+        filter.notEquals('Doe');
+        
+##### greaterThan / greaterThanOrEqual
+
+        var filter = qodata.filter('Price');
+        
+        filter.greaterThan(199);
+        filter.greaterThanOrEqual(200);
+        
+##### lessThan / lessThanOrEqual
+
+        filter.lessThan(501);
+        filter.lessThanOrEqual(500);
+        
+##### has
+Returns true if the right hand operand is an enumeration value whose flag(s) are set on the left operand
+
+        var filter = qodata.filter('Type');
+        
+        filter.has('CustomerType', 'Super');
+        
+#### arithmetic operators
+
+##### add
+
+        var filter = qodata.filter('Price').add(50).equals(200);
+
+##### sub
+
+        var filter = qodata.filter('Price').sub(50).equals(150);
+
+##### mul
+
+        var filter = qodata.filter('Price').mul(2).equals(200);
+
+##### div
+
+        var filter = qodata.filter('Price').div(2).equals(100);
+
+##### mod
+
+        var filter = qodata.filter('Price').mod(5).equals(0);
+        
+#### string functions
+
+        var filter = qodata.filter('FirstName');
+        
+##### contains
+
+        filter.contains('John');
+
+##### endswith
+
+        filter.endswith('hn')
+
+##### startswith
+
+        filter.startswith('Jo');
+
+##### indexof
+
+        filter.indexof('J').equals(0);
+
+##### substring
+
+        // selecting from char 2 to the end of the string
+        filter.substring(2).equals('ohn');
+        
+        // selecting 2 chars from the second char.
+        filter.substring(2, 2).equals('oh');
+
+##### length
+        
+
+        filter.length().equals(4);
+
+##### tolower
+
+        filter.tolower().equals('john');
+        
+##### toupper
+
+        filter.toupper().equals('JOHN');
+
+##### trim
+
+        filter.trim().equals('John');
+
+##### concat
+
+        filter.concat(qodata.literal(' Junior')).equals('John Junior');
+        filter.concat('LastName').equals('John Doe');
+        
+#### date functions
+
+        var filter = qodata.filter('BirthDate');
+        
+##### year, month, day
+
+        filter.year().equals(1980);
+        filter.month().equals(12);
+        filter.day().equals(01);
+        
+##### hour, minute, second, fractionalseconds
+
+        filter.hour().equals(23);
+        filter.minute().equals(30);
+        filter.second().equals(30);
+        filter.fractionalseconds.equals(230);
+        
+##### date, time
+
+        filter.date().equals(dd/mm/yyyy);
+        filter.time().equals(hh:mm:ss);
+        
+##### other
+
+        filter.totaloffsetminutes().equals(....);
+        filter.mindatetime().equals(....);
+        filter.maxdatetime().equals(....);
+        filter.totalseconds().equals(....);
+        filter.now().equals(....);
+        
+#### mathematics functions
+
+        var filter = qodata.filter('Amount');
+        
+##### round
+
+        filter.round().equals(10);
+
+##### floor
+
+        filter.floor().equals(10);
+
+##### ceiling
+
+        filter.ceiling().equals(10);
+        
+#### type functions : cast & isof
+
+        filter.cast('int').equals(10);
+        filter.isof('decimal').equals(true);
+        
+        // equals to
+        qodata.filter().cast('Price', 'int').equals(10);
+        qodata.filter().isof('Price', 'decimal').equals(true);
+        
+#### count
+
+        var orders = myQuery.from('Orders');
+        var filter = orders.filter('Products');
+        
+        filter.count().greaterThan(5);
+        
+#### any & all
+param1: MUST be a filter
+
+        var filter = qodata.filter('Products');
+        
+        filter.any(qodata.filter('Quantity').greaterThan(20));
+        filter.all(qodata.filter('Quantity').greaterThan(20));
+        
+#### grouping filters
+
+Setting a filter in a filter automatically groups the inner one
+
+        var filter = qodata.filter('FirstName').equals('John').and(qodata.filter('LastName').contains('Doe').or('LastName').contains('Captain'));
+        
+Calling the group method
+
+        var filter = qodata.filter('FirstName').equals('John').and(qodata.filter('LastName').contains('Doe').or('LastName').contains('Captain').group());
+        
+        
+# Some examples
+
+Some examples to come soon...
