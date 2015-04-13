@@ -292,9 +292,174 @@ param1 : mandatory, can be a '/' separated string or an array
     // equals to
     myQuery.from('Customers').navigate('Orders/Product');
     // equals to
-    myQuery.from('Customers').navigate('['Orders', 'Product']);
+    myQuery.from('Customers').navigate(['Orders', 'Product']);
     
 #### remove navigation properties
 
-    myQuery.from('Customers').reset();
+    myQuery.from('Customers').navigate.reset();
+    
+## The entity namespace
+The qodata.entity lets you work with the where and expand functions
+
+### Creating new entity
+
+    var customers = qodata.entity('Customers');
+    // or selecting a customer by it's ID
+    var customers = qodata.entity('Customers', 10); // equals to e.single(10), see below
+    
+#### PROPERTY name
+You can get the entity name by calling this property
+
+    customers.name // -> Customers
+    
+#### FUNCTION single
+Lets you select ONE entity by setting it's id
+
+    customers.single(10); // 10 is the Customer's ID
+    
+##### reset the entity's selection by ID
+
+    customers.single.reset();
+    
+#### FUNCTION select
+Allows clients to requests a specific set of properties for each entity or complex type
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398163
+
+param 1 : mandatory, can be a comma separated string or an array
+
+        customers.select('FirstName,LastName');
+        customers.select(['BirthDate', 'City Of Birth']);
+        
+##### remove selected properties
+
+        customers.select.remove('FirstName');
+        
+##### remove all setected properties
+
+        customers.select.reset();
+        
+#### FUNCTION expand
+Specifies the related resources to be included in line with retrieved resources
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398162
+
+param 1 : mandatory, can be a string (in this case qodata internally creates an entity) or an entity
+
+This method returns the expanded entity, so chaining functions acts on the returned entity (the expanded property)
+
+        // expand with a string
+        customers.expand('Orders').orderby('Price').desc(); // chained orderby function acts on the expanded property 'Orders')
+        // expand with an entity
+        var orders = qodata.entity('Orders').orderby('Price').asc();
+        customers.expand(orders);
+        
+##### remove expanded property
+
+        customers.expand.remove('Orders');
+        // or
+        customers.expand.remvoe(orders);
+        
+##### remove all expanded properties
+
+        customers.expand.reset();
+        
+#### FUNCTION orderby
+Allows clients to request resources in a particular order
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398164
+
+Unlike the qodata.query.orderby shortcut, this method MUST be followed by one of the asc() or desc() methods
+
+        customers.orderby('FirstName').asc();
+        customers.orderby('FirstName').desc();
+        
+##### toggle orderby
+
+        customers.orderby('FirstName').toggle();
+        customers.orderby.toggle('FirstName');
+        
+##### force an orderby on already setted properties
+
+        customers.orderby.asc('FirstName');
+        customers.orderby.desc('FirstName');
+        
+##### remove an orderby property
+
+        customers.orderby.remove('FirstName');
+        
+#### remove all orderby properties
+
+        customers.orderby.reset();
+        
+#### FUNCTION where
+Allows clients to filter a collection of resources that are addressed by a request URL
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398094
+
+This method is a singleton, that is eveytime you call this method, the previous filter is replaced
+
+##### creating a filter
+
+        var filter = qodata.filter('FirstName').equals('John');
+        
+        customers.where(filter);
+        
+##### remove a filter
+
+        customers.where.reset();
+        
+
+### FUNCTION asValue
+To address the raw value of a primitive property
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398086
+
+#### switch on value
+
+    customers.single(1).navigate('FirstName').asValue();
+    
+##### optional parameter
+This syntax equals the one above
+
+    customers.single(1).navigate('FirstName').asValue(true);
+    
+#### switch off value
+
+    customers.single(1).navigate('FirstName').asValue(false);
+    // or
+    customers.single(1).navigate('FirstName').asValue.reset();
+    
+### FUNCTION top & skip
+The top system query option requests the number of items in the queried collection to be included in the result. The skip query option requests the number of items in the queried collection that are to be skipped and not included in the result
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398165
+
+#### Setting top & skip
+
+    customers.top(40);
+    customers.skip(10);
+    
+#### reset to default values
+Resets to qodata.defaults values
+
+    customers.top.reset();
+    customers.skip.reset();
+    
+### FUNCTION navigate
+See 'path expressions' http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398158
+
+param1 : mandatory, can be a '/' separated string or an array
+
+#### Setting a navigation property
+
+    customers.navigate('Orders').navigate('Product')
+    // equals to
+    customers.navigate('Orders/Product');
+    // equals to
+    customers.navigate(['Orders', 'Product']);
+    
+#### remove navigation properties
+
+    customers.navigate.reset();
     
