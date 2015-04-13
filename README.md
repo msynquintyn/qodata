@@ -173,10 +173,13 @@ Sets the id of the resource to get
 
     myQuery.select.reset();
     
-### FUNCTION expand (!)  (shortcut to the entity expand function)
+### FUNCTION expand (shortcut to the entity expand function)
 Specifies the related resources to be included in line with retrieved resources
 
 See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398162
+
+As of shortcut to the entity function, expand is 'chainable'.
+As of the entity function (see chapter 'entity'), calling the expand function returns the expanded entity, so chaining functions acts on the expanded entity...
 
 * param 1: mandatory, can be a string or an qodata.entity
 
@@ -242,4 +245,56 @@ param1: filter to apply, its type is qodata.filter
         .or('LastName').equals('Doe')
     );
     
-# TO BE CONTINUED...#
+### FUNCTION asValue (shortcut to the entity asValue function)
+To address the raw value of a primitive property
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398086
+
+#### switch on value
+
+    myQuery.from('Customers(1)/FirstName').asValue();
+    
+##### optional parameter
+This syntax equals the one above
+
+    myQuery.from('Customers(1)/FirstName').asValue(true);
+    
+#### switch off value
+
+    myQuery.from('Customers(1)/FirstName').asValue(false);
+    // or
+    myQuery.from('Customers'(1)/FirstName').asValue.reset();
+    
+### FUNCTION top & skip (shortcuts to the entity functions)
+The top system query option requests the number of items in the queried collection to be included in the result. The skip query option requests the number of items in the queried collection that are to be skipped and not included in the result
+
+See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398165
+
+#### Setting top & skip
+
+    myQuery.top(40);
+    myQuery.skip(10);
+    
+#### reset to default values
+Resets to qodata.defaults values
+
+    myQuery.top.reset();
+    myQuery.skip.reset();
+    
+### FUNCTION navigate (shortcut to the entity navigate function)
+See 'path expressions' http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398158
+
+param1 : mandatory, can be a '/' separated string or an array
+
+#### Setting a navigation property
+
+    myQuery.from('Customers').navigate('Orders').navigate('Product')
+    // equals to
+    myQuery.from('Customers').navigate('Orders/Product');
+    // equals to
+    myQuery.from('Customers').navigate('['Orders', 'Product']);
+    
+#### remove navigation properties
+
+    myQuery.from('Customers').reset();
+    
