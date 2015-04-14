@@ -371,6 +371,8 @@ See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-c
 
 Unlike the qodata.query.orderby shortcut, this method MUST be followed by one of the asc() or desc() methods
 
+param 1: can be a coma separated string or an array
+
         customers.orderby('FirstName').asc();
         customers.orderby('FirstName').desc();
         
