@@ -299,19 +299,19 @@ function filter(property){
 	// type functions
 	this.cast = function(value, valueType){
 		if(valueType == undefined)
-			return add_clause(false, new _clause(_funcFormat, 'cast', value));
+			return add_clause(true, new _clause(_funcFormat, 'cast', property, value));
 		else
 			return add_clause(false, new _clause(_funcFormat, 'cast', value, valueType));
 	};
 	this.isof = function(value, valueType){
 		if(valueType == undefined)
-			return add_clause(false, new _clause(_funcFormat, 'isof', value));
+			return add_clause(true, new _clause(_funcFormat, 'isof', property, value));
 		else
 			return add_clause(false, new _clause(_funcFormat, 'isof', value, valueType));
 	};
 	// other functions
 	this.count = function(){
-		return add_clause(false, new _clause(_opFormat, '/$count', property));
+		return add_clause(true, new _clause(_opFormat, '/$count', property));
 	};
 	// lambda operators
 	this.any = function(comparisonFunc){
