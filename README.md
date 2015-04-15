@@ -658,4 +658,58 @@ Calling the group method
         
 # Some examples
 
-Some examples to come soon...
+
+Ok! So, let's go to the ODATA.org service and make a request !
+
+What we want is this request (copy this request to your browser address bar and see the result !) :
+
+http://services.odata.org/V4/Northwind/Northwind.svc/Customers?$select=CompanyName,CustomerID,ContactName,Address,City,Country&$orderby=ContactName desc&$expand=Orders($select=OrderDate,ShipName;$orderby=OrderDate desc;$expand=Order_Details($expand=Product($select=ProductName,UnitPrice,UnitsInStock;$filter=UnitPrice gt 9)))&$filter=contains(ContactName,'an') or Country eq 'France'
+
+## Example #1 : let's chain all methods !
+
+        var query = qodata.query('http://services.odata.org/V4/Northwind/Northwind.svc');
+        
+        query.from('Customers')
+        	.select('CompanyName,CustomerID,ContactName,Address,City,Country')
+        	.orderby('ContactName').desc()
+        	.where(qodata.filter('ContactName').contains('an').or('Country').equals('France'))
+        	.expand(qodata.entity('Orders').select(['OrderDate', 'ShipName']).orderby('OrderDate').desc())
+        	.expand('Order_Details')
+        	.expand(qodata.entity('Product').select(['ProductName', 'UnitPrice', 'UnitsInStock']).where(qodata.filter('UnitPrice').greaterThan(9)));
+        	
+        query.toString();
+        
+## Example #2 : let's do the same request as above but work with objects
+
+        var query = qodata.query('http://services.odata.org/V4/Northwind/Northwind.svc');
+        
+        var customers = qodata.entity('Customers')
+	        .select('CompanyName, CustomerID, ContactName, Address, City, Country')
+	        .orderby('ContactName').desc()
+	        .where(qodata.filter('ContactName').contains('an').or('Country').equals('France'));
+	
+        var orders = qodata.entity('Orders')
+        	.select(['OrderDate', 'ShipName'])
+        	.orderby('OrderDate').desc();
+    	
+        var details = orders.expand(qodata.entity('Order_Details'));
+    
+        details.expand(
+        	qodata.entity('Product')
+        		.select(['ProductName', 'UnitPrice', 'UnitsInStock'])
+        		.where(qodata.filter('UnitPrice').greaterThan(9))
+        	);
+    	
+        customers.expand(orders);
+    
+        /*	alternative
+        customers
+        	.expand(qodata.entity('Orders').select(['OrderDate', 'ShipName']).orderby('OrderDate').desc())
+        	.expand('Order_Details')
+        	.expand(qodata.entity('Product').select(['ProductName', 'UnitPrice', 'UnitsInStock']).where(qodata.filter('UnitPrice').greaterThan(9)))
+        	;
+        */	
+    
+        query.from(customers);
+    
+        query.toString();
