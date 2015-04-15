@@ -362,7 +362,7 @@ function filter(property){
 	};
 }
 
-var entity = function(e){
+function entity(e){
 	this.name = e;
 	
 	var that = this;
@@ -413,11 +413,11 @@ var entity = function(e){
 	var expandSettings = {
 		expands: {},
 		set: function(ex){
-			var name = ex instanceof entity ? ex.name : ex;
+			var name = (ex instanceof entity) ? ex.name : ex;
 			
 			if(!this.expands[name])
-				this.expands[name] = ex instanceof entity ? ex : new entity(ex);
-			return this.expands[ex];
+				this.expands[name] = (ex instanceof entity) ? ex : new entity(ex);
+			return this.expands[name];
 		},
 		toString: function(){
 			var parts = [];
