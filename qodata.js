@@ -30,6 +30,29 @@ if (!String.prototype.trim) {
   })();
 }
 
+if (!Date.prototype.toISOString) {
+  (function() {
+    function pad(number) {
+      if ( number < 10 ) {
+        return '0' + number;
+      }
+      return number;
+    }
+ 
+    Date.prototype.toISOString = function() {
+      return this.getUTCFullYear() +
+        '-' + pad( this.getUTCMonth() + 1 ) +
+        '-' + pad( this.getUTCDate() ) +
+        'T' + pad( this.getUTCHours() ) +
+        ':' + pad( this.getUTCMinutes() ) +
+        ':' + pad( this.getUTCSeconds() ) +
+        '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+        'Z';
+    };
+  
+  }());
+}
+
 (function (window) {
 
 "use strict";
@@ -174,41 +197,41 @@ function filter(property){
 	// OPERATORS
 	// comparison operators
 	this.equals = function(value){
-		return add_clause(false, new _clause(_opFormat, 'eq', property, typeof value == 'string' ? qodata.literal(value) : value));
+		return add_clause(false, new _clause(_opFormat, 'eq', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.notEquals = function(value){
-		return add_clause(false, new _clause(_opFormat, 'ne', property, typeof value == 'string' ? qodata.literal(value) : value));
+		return add_clause(false, new _clause(_opFormat, 'ne', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.greaterThan = function(value){
-		return add_clause(false, new _clause(_opFormat, 'gt', property, value));
+		return add_clause(false, new _clause(_opFormat, 'gt', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.greaterThanOrEqual = function(value){
-		return add_clause(false, new _clause(_opFormat, 'ge', property, value));
+		return add_clause(false, new _clause(_opFormat, 'ge', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.lessThan = function(value){
-		return add_clause(false, new _clause(_opFormat, 'lt', property, value));
+		return add_clause(false, new _clause(_opFormat, 'lt', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.lessThanOrEqual = function(value){
-		return add_clause(false, new _clause(_opFormat, 'le', property, value));
+		return add_clause(false, new _clause(_opFormat, 'le', property, typeof value == 'string' ? qodata.literal(value) : value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.has = function(enumerator, value){
 		return add_clause(true, new _clause(_opFormat, 'has', property, '{0}{1}'.format(enumerator, qodata.literal(value))));
 	};
 	// arithmetic operators
 	this.add = function(value){
-		return add_clause(true, new _clause(_opFormat, 'add', property, value));
+		return add_clause(true, new _clause(_opFormat, 'add', property, value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.sub = function(value){
-		return add_clause(true, new _clause(_opFormat, 'sub', property, value));
+		return add_clause(true, new _clause(_opFormat, 'sub', property, value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.mul = function(value){
-		return add_clause(true, new _clause(_opFormat, 'mul', property, value));
+		return add_clause(true, new _clause(_opFormat, 'mul', property, value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.div = function(value){
-		return add_clause(true, new _clause(_opFormat, 'div', property, value));
+		return add_clause(true, new _clause(_opFormat, 'div', property, value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	this.mod = function(value){
-		return add_clause(true, new _clause(_opFormat, 'mod', property, value));
+		return add_clause(true, new _clause(_opFormat, 'mod', property, value instanceof Date ? qodata.defaults.date.format(value) : value));
 	};
 	
 	// FUNCTIONS
@@ -909,6 +932,12 @@ window.qodata = {
 	literal: function(s){
 		return "'{0}'".format(s);
 	},
+	datetimeoffset : function(dateProperty, modelType){
+		if(modelType == undefined)
+			modelType = 'Edm.DateTimeOffset';
+		
+		return qodata.filter().cast(dateProperty, modelType).toString();
+	},
 	it: function(){
 		return '$it';
 	},
@@ -920,7 +949,12 @@ window.qodata = {
 		skip: undefined,
 		count: false,
 		metadata: false,
-		format: null
+		format: null,
+		date : {
+			format: function(d){
+				return d.toISOString();
+			}
+		}
 	}
 };
 
