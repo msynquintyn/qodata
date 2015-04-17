@@ -51,6 +51,14 @@ Set default values for all your queries
 
     qodata.defaults.format = 'json';
 
+### FUNCTION date.format (defaults to toISOString())
+Here, you can define the default format qodata will take to render dates in filter operators.
+
+The default function returns an ISO String. You can specify you prefered format, the only constrainst is that it must be compatible with your OData implementation date filters.
+
+For example, you can include moment.js and redefine this function.
+
+	qodata.defaults.date.format = function(d) { return moment(d).format('DD-MM-YYYY'); }
 
 ## The qodata namespace
 
