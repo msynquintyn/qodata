@@ -92,6 +92,16 @@ Forces qodata to add quotes around the parameter in the generated OData query
 
     myQuery.where('CustomerID').contains(qodata.literal(10));
     
+### FUNCTION datetimeoffset
+Sometimes, you must cast a date property to compare dates.
+
+param 1 : mandatory, the property to cast as DateTimeOffset
+
+param 2 : optional, defaults to Edm.DateTimeOffset
+
+	var filter = qodata.filter(qodata.datetimeoffset('BirthDate')).lessThan(new Date());
+	// Renders as : cast(BirthDate,Edm.DateTimeOffset) lt 2015-04-17T07:24:54.415Z
+
 ## The query namespace
 
 ### PROPERTY service
