@@ -59,6 +59,10 @@ The default function returns an ISO String. You can specify you prefered format,
 For example, you can include moment.js and redefine this function.
 
 	qodata.defaults.date.format = function(d) { return moment(d).format('DD-MM-YYYY'); }
+	
+	// later in your code
+	var filter = qodata.filter('BirthDate').lessThan(new Date());
+	// Renders as : BirthDate lt 17-04-2015
 
 ## The qodata namespace
 
