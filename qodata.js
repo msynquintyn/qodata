@@ -597,10 +597,10 @@ function entity(e){
 			return '';
 		}
 	};
-	this.navigate = function(p){
+	this.path = function(p){
 		return navSettings.push(Array.isArray(p) ? p : p.split('/'));
 	};
-	this.navigate.reset = function(){
+	this.path.reset = function(){
 		navSettings.properties.length = 0;
 	};
 	
@@ -878,15 +878,15 @@ var q = function(serviceUri){
 		return that;
 	};
 	
-	this.navigate = function(properties){
+	this.path = function(properties){
 		checkEntity();
-		entitySettings.entity.navigate(properties);
+		entitySettings.entity.path(properties);
 		
 		return that;
 	};
-	this.navigate.reset = function(){
+	this.path.reset = function(){
 		checkEntity();
-		entitySettings.entity.navigate.reset();
+		entitySettings.entity.path.reset();
 		
 		return that;
 	};

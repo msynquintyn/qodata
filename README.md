@@ -303,22 +303,22 @@ Resets to qodata.defaults values
     myQuery.top.reset();
     myQuery.skip.reset();
     
-### FUNCTION navigate (shortcut to the entity navigate function)
+### FUNCTION path (shortcut to the entity path function)
 See 'path expressions' http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398158
 
 param1 : mandatory, can be a '/' separated string or an array
 
-#### Setting a navigation property
+#### Setting a path property
 
-    myQuery.from('Customers').navigate('Orders').navigate('Product')
+    myQuery.from('Customers').path('Orders').path('Product')
     // equals to
-    myQuery.from('Customers').navigate('Orders/Product');
+    myQuery.from('Customers').path('Orders/Product');
     // equals to
-    myQuery.from('Customers').navigate(['Orders', 'Product']);
+    myQuery.from('Customers').path(['Orders', 'Product']);
     
 #### remove navigation properties
 
-    myQuery.from('Customers').navigate.reset();
+    myQuery.from('Customers').path.reset();
     
 ## The entity namespace
 The qodata.entity lets you work with the where and expand functions
@@ -441,18 +441,18 @@ See http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-c
 
 #### switch on value
 
-    customers.single(1).navigate('FirstName').asValue();
+    customers.single(1).path('FirstName').asValue();
     
 ##### optional parameter
 This syntax equals the one above
 
-    customers.single(1).navigate('FirstName').asValue(true);
+    customers.single(1).path('FirstName').asValue(true);
     
 #### switch off value
 
-    customers.single(1).navigate('FirstName').asValue(false);
+    customers.single(1).path('FirstName').asValue(false);
     // or
-    customers.single(1).navigate('FirstName').asValue.reset();
+    customers.single(1).path('FirstName').asValue.reset();
     
 ### FUNCTION top & skip
 The top system query option requests the number of items in the queried collection to be included in the result. The skip query option requests the number of items in the queried collection that are to be skipped and not included in the result
@@ -470,22 +470,22 @@ Resets to qodata.defaults values
     customers.top.reset();
     customers.skip.reset();
     
-### FUNCTION navigate
+### FUNCTION path
 See 'path expressions' http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part2-url-conventions/odata-v4.0-errata02-os-part2-url-conventions-complete.html#_Toc406398158
 
 param1 : mandatory, can be a '/' separated string or an array
 
 #### Setting a navigation property
 
-    customers.navigate('Orders').navigate('Product')
+    customers.path('Orders').path('Product')
     // equals to
-    customers.navigate('Orders/Product');
+    customers.path('Orders/Product');
     // equals to
-    customers.navigate(['Orders', 'Product']);
+    customers.path(['Orders', 'Product']);
     
 #### remove navigation properties
 
-    customers.navigate.reset();
+    customers.path.reset();
     
 ### The filter namespace
 qodata filters are used in the qodata.query.where and qodata.entity.where functions
