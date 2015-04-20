@@ -457,7 +457,7 @@ function entity(e){
 		return expandSettings.set(ex);
 	};
 	this.expand.reset = function(){
-		expandSettings = {};
+		expandSettings.expands = {};
 		return this;
 	};
 	this.expand.remove = function(ex){
