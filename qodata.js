@@ -445,9 +445,9 @@ function entity(e){
 		toString: function(){
 			var parts = [];
 			for(var ent in this.expands){
-				parts.push('$expand={0}'.format(this.expands[ent].toString(true)));
+				parts.push(this.expands[ent].toString(true));
 			}
-			return parts.length ? parts.join('&') : '';
+			return '$expand={0}'.format(parts.join(','));
 		},
 		isset: function(){
 			return Object.keys(this.expands).length;
