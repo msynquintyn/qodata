@@ -173,7 +173,7 @@ function filter(property){
 			add_clause(false, andProperty);
 		else
 			property = andProperty;
-		return this;
+		return that;
 	};
 	this.or = function(orProperty){
 		add_clause(false, new _link('or'));
@@ -182,7 +182,7 @@ function filter(property){
 			add_clause(false, orProperty);
 		else
 			property = orProperty;
-		return this;
+		return that;
 	};
 	this.not = function(notProperty){
 		add_clause(false, new _link('not', ''));
@@ -191,7 +191,7 @@ function filter(property){
 			add_clause(false, notProperty.group());
 		else
 			property = notProperty;
-		return this;
+		return that;
 	};
 	
 	// OPERATORS
@@ -369,7 +369,7 @@ function filter(property){
 	};
 	this.group = function(grouped){
 		groupSettings.group = grouped != undefined ? grouped : true;
-		return this;
+		return that;
 	};
 	
 	this.toString = function(){
@@ -401,11 +401,11 @@ function entity(e){
 	};
 	this.single = function(id){
 		idSettings.id = typeof id == 'string' ? qodata.literal(id) : id;
-		return this;
+		return that;
 	};
 	this.single.reset = function(){
 		idSettings.id = null;
-		return this;
+		return that;
 	};
 	
 	var selectSettings = {
@@ -421,16 +421,16 @@ function entity(e){
 	};
 	this.select = function(properties){
 		selectSettings.properties = Array.isArray(properties) ? properties : properties.split(',');
-		return this;
+		return that;
 	};
 	this.select.reset = function(){
 		selectSettings.properties.length = 0;
-		return this;
+		return that;
 	};
 	this.select.remove = function(property){
 		if(selectSettings.properties.indexOf(property) > -1)
 			selectSettings.properties.splice(selectSettings.properties.indexOf(property), 1);
-		return this;
+		return that;
 	};
 	
 	var expandSettings = {
@@ -458,14 +458,14 @@ function entity(e){
 	};
 	this.expand.reset = function(){
 		expandSettings.expands = {};
-		return this;
+		return that;
 	};
 	this.expand.remove = function(ex){
 		var name = ex instanceof entity ? ex.name : ex;
 		
 		if(expandSettings.expands[name])
 			delete expandSettings.expands[name];
-		return this;
+		return that;
 	};
 
 	var orderbySettings = {
@@ -491,12 +491,12 @@ function entity(e){
 	};
 	this.orderby.reset = function(){
 		orderbySettings.properties = {};
-		return this;
+		return that;
 	};
 	this.orderby.remove = function(properties){
 		if(orderbySettings.properties[properties])
 			delete orderbySettings.properties[properties];
-		return this;
+		return that;
 	};
 	
 	var filterSettings = {
@@ -510,11 +510,11 @@ function entity(e){
 	};
 	this.where = function(filter){
 		filterSettings.filter = filter;
-		return this;
+		return that;
 	};
 	this.where.reset = function(){
 		filterSettings.filter = null;
-		return this;
+		return that;
 	};
 	
 	var valueSettings = {
@@ -533,11 +533,11 @@ function entity(e){
 	this.asValue = function(value){
 		valueSettings.value = value === undefined ? true : value;
 		//valueSettings.property = property;
-		return this;
+		return that;
 	}
 	this.asValue.reset = function(){
 		valueSettings.value = false;
-		return this;
+		return that;
 	};
 	
 	var topSettings = {
@@ -553,11 +553,11 @@ function entity(e){
 	};
 	this.top = function(n){
 		topSettings.top = n;
-		return this;
+		return that;
 	};
 	this.top.reset = function(){
 		topSettings.top = qodata.defaults.top;
-		return this;
+		return that;
 	};
 	
 	var skipSettings = {
@@ -573,11 +573,11 @@ function entity(e){
 	};
 	this.skip = function(n){
 		skipSettings.skip = n;
-		return this;
+		return that;
 	};
 	this.skip.reset = function(){
 		skipSettings.skip = qodata.defaults.skip;
-		return this;
+		return that;
 	};
 	
 	var navSettings = {
